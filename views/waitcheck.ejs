@@ -29,8 +29,8 @@
 
       <div class="row">
         <div class="col text-center">
-          <p> <대기번호> </p>
-          <h4> <%= 사용자.id %>님의 대기번호는 <%= 본인웨이팅번호.myNumber %>이고, <br>
+          <h4> "<%= 사용자.id %>"님의 대기번호는 <%= 본인웨이팅번호.myNumber %>번 입니다. <br>
+               현재 앞에 <%= (본인웨이팅번호.myNumber) - (대기사용수.totalUse) - 1 %>명이 있습니다.
           </h4>
         </div>
       </div>

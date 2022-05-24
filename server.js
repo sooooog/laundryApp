@@ -238,14 +238,12 @@ passport.deserializeUser(function (아이디, done) {
 });
 
 //4. 세션있는 사람만 들어가는 웨이팅페이지(EJS와 라우팅)
-//미들웨어 사용 - 웨이팅, 웨이팅 신청성공, 웨이팅 확인 페이지 접속할 때마다 '로그인여부()' 실행
+//미들웨어 사용 - 웨이팅과 관련된 페이지 접속할 때마다 '로그인여부()' 실행
 
 //웨이팅 페이지
 app.get('/wait', 로그인여부, function (req, res) { 
     console.log(req.user);
-    //res.render('wait.ejs', {사용자 : req.user})  //req.user를 사용자라는 이름으로 보냄
 
-    //-------------------------------------------------
     //DB에서 데이터 꺼내기 - DB.counter 내의 대기인원수를 찾음
     db.collection('counter').findOne({name : '대기인원수'}, function(에러, 결과){
         console.log("/wait 대기인원수 : " + 결과.totalWait) //결과.totalWait = 대기인원수
@@ -254,7 +252,6 @@ app.get('/wait', 로그인여부, function (req, res) {
         //req.user를 사용자라는 이름으로, 결과를 counters라는 이름으로 보내기
         res.render('wait.ejs', {사용자 : req.user, counters : 결과})
     });
-    //-------------------------------------------------
 })
 
 app.post('/wait', 로그인여부, function(req, res){
@@ -294,44 +291,27 @@ app.post('/wait', 로그인여부, function(req, res){
 //웨이팅 확인 페이지
 app.get('/waitcheck', 로그인여부, function (req, res) { 
     console.log(req.user); 
-    //res.render('waitcheck.ejs', {사용자 : req.user})  //req.user를 사용자라는 이름으로 보냄
 
-    //--------------------------------------------------
-    //db.waitinfo에 로그인한 유저의 id를 찾고
+    //db.waitinfo에 로그인한 유저의 id 찾기
     db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과1){
-        console.log("/waitcheck 본인웨이팅번호 : " + 결과1.myNumber)
+        var myNumber = 결과1.myNumber;
+        console.log("/waitcheck 본인웨이팅번호 : " + myNumber)
 
         //db.counter에서 name이 대기인원수인 데이터 찾기
         db.collection('counter').findOne({name: '대기인원수'}, function(에러, 결과2){
+            var totalWait = 결과2.totalWait;
+            var totalUse = 결과2.totalUse;
+            var left = myNumber - totalUse - 1
 
-            console.log("/waitcheck 대기인원수 : " + 결과2.totalWait)
-            console.log("/waitcheck 앞에남은인원수 : " + (결과2.totalWait) -1)
+            console.log("/waitcheck 대기인원수 : " + totalWait)
+            console.log("/waitcheck 대기사용수 : " + totalUse)
+            console.log("/waitcheck 앞에남은인원수 : " + left)
 
+            //찾은 데이터를 waitcheck.ejs 안에 넣기
+            //req.user를 사용자라는 이름으로 보내기
+            res.render('waitcheck.ejs', {사용자 : req.user, 본인웨이팅번호 : 결과1, 대기사용수 : 결과2})
         })
-        
-        //찾은 데이터를 waitcheck.ejs 안에 넣기
-        //req.user를 사용자라는 이름으로, 결과를 본인웨이팅번호라는 이름으로 보내기
-        res.render('waitcheck.ejs', {사용자 : req.user, 본인웨이팅번호 : 결과1})
-    });
-
-    /*//DB에서 데이터 꺼내기 - DB.waitinfo 내의 유저의 아이디를 찾음
-    db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과){
-        console.log("/waitcheck 본인웨이팅번호 : " + 결과.myNumber)
-
-        //DB에서 데이터 꺼내기 - DB.counter 내의 대기인원수를 찾음
-        db.collection('counter').findOne({name: '대기인원수'}, function(에러, 결과) {
-        //var 현재본인웨이팅번호 = (결과.tatalWait) - 1;
-
-        console.log("/waitcheck 현재본인웨이팅번호 : " + (결과.tatalWait) - 1)
-
-        //찾은 데이터를 waitcheck.ejs 안에 넣기
-        //req.user를 사용자라는 이름으로, 결과를 본인웨이팅번호라는 이름으로 보내기
-        res.render('waitcheck.ejs', {사용자 : req.user, waitinfo : 결과, 현재본인웨이팅번호 : (결과.tatalWait) - 1})
-        });
-    });*/
-
-    
-    //--------------------------------------------------
+    });    
 }) 
 
 //미들웨어 생성
