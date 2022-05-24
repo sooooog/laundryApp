@@ -129,8 +129,7 @@ app.get('/pet', function(req, res){
 */
 //홈(/) 페이지
 app.get('/', function(req, res){
-    //res.render('/home1.ejs')
-    res.sendFile(__dirname + '/home.html')
+    res.render('home.ejs')
 })
 
 //로그인(/login) 페이지
@@ -140,13 +139,12 @@ app.get('/login', function(req, res) {
 
 //회원가입(/signup) 페이지
 app.get('/signup', function(req, res) { 
-    //res.render('/signup.ejs')
-    res.sendFile(__dirname + '/signup.html')
+    res.render('signup.ejs')
 });
 
 //주의사항(/caution) 페이지
 app.get('/caution', function(req, res){
-    res.render('/caution.ejs')
+    res.render('caution.ejs')
 })
 
 
@@ -273,7 +271,9 @@ app.get('/wait', 로그인여부, function (req, res) {
         res.render('wait.ejs', {사용자 : req.user, counters : 결과})
     });
     //-------------------------------------------------
-}) 
+})
+
+//app.post()
 
 //웨이팅신청여부 미들웨어
 /*var 웨이팅신청여부 = function (req, res, next){

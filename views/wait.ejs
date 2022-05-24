@@ -19,17 +19,19 @@
 
     <h4 class="ml-2 my-3"><strong>웨이팅 페이지</strong></h4>
 
-    <div class="container" style="background-color:lightblue; padding:30px;">
-      <div class="row">
-        <div class="col text-center">
-          <p> 웨이팅 할 기기를 선택해주세요. </p>
-          <button class="btn btn-primary" type="submit" onClick="location.href='/waitcomplete'" >세탁기</button>
-          <!-- onClick="location.href='/waitcomplete'"-->
-          <button class="btn btn-primary">건조기</button>
-          <br>
+    <form action="/wait" method="POST">
+      <div class="container" style="background-color:lightblue; padding:30px;">
+        <div class="row">
+          <div class="col text-center">
+            <p> 웨이팅 할 기기를 선택해주세요. </p>
+            <button class="btn btn-primary" type="submit">세탁기</button>
+            <!-- onClick="location.href='/waitcomplete'"-->
+            <button class="btn btn-primary">건조기</button>
+            <br>
+          </div>
         </div>
       </div>
-    </div>
+    </form>
 
     <div class="container" style="padding:30px">
       <div class="row">
