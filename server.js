@@ -67,7 +67,7 @@ MongoClient.connect(process.env.DB_URL, { useUnifiedTopology: true }, function(�
     
 
     //회원가입 시 아이디 중복 검사(추가중..)-------------------------------------
-    app.post('/signup', function(req, res){
+    /*app.post('/signup', function(req, res){
         db.collection('customer').findOne({ id: req.body.userid }, function (에러, 결과) {
             if (에러) return done(에러)
 
@@ -86,19 +86,19 @@ MongoClient.connect(process.env.DB_URL, { useUnifiedTopology: true }, function(�
             })}
         })
     })
-    //-------------------------------------------------------------------------
+    //-------------------------------------------------------------------------*/
 
     //회원가입(signup)에서 input한 데이터를 db에 저장하기------------------------    
-    /*app.post('/signup', function(req, res){
+    app.post('/signup', function(req, res){
         db.collection('customer').insertOne( {name : req.body.username, id : req.body.userid,
             pw : req.body.userpw1, phone : req.body.userphone},
             function(에러, 결과){
         console.log('회원가입 데이터 저장완료'); 
-    });
+        });
 
-    res.redirect('/login')   //회원가입 성공 시 /login으로 이동
-    console.log('회원가입 성공')
-    })*/
+        res.redirect('/login')   //회원가입 성공 시 /login으로 이동
+        console.log('회원가입 성공')
+    })
     //-------------------------------------------------------------------------
 
 
@@ -147,6 +147,15 @@ app.get('/caution', function(req, res){
     res.render('caution.ejs')
 })
 
+//웨이팅 신청성공 페이지
+app.get('/waitsuccess', function(req, res){
+    res.render('waitsuccess.ejs')
+})
+
+//웨이팅 신청실패 페이지
+app.get('/waitfail', function(req, res){
+    res.render('waitfail.ejs')
+})
 
 
 /* POST(쓰기) 요청을 처리하는 기계
@@ -159,31 +168,6 @@ app.post('/login', function(req, res){
     console.log(req.body.id)
     console.log(req.body.pw)
 }) */
-
-// /wait으로 POST 요청을 하면..
-/*app.post('/waitcomplete', 로그인여부, function(req, res){
-    res.send('전송완료')
-
-    //DB에서 데이터 꺼내기 - DB.counter 내의 대기인원수를 찾음
-    db.collection('counter').findOne({name: '대기인원수'}, function(에러, 결과){
-        console.log("대기인원수 : " + 결과.totalWait) //결과.totalWait = 대기인원수
-        var 총대기인원수 = 결과.totalWait   //총대기인원수라는 변수에 저장
-        //var 개인웨이팅번호 = 총대기인원수 - 
-
-        //DB에 저장하기 - _id : 총대기인원수+1 해서 새로운 데이터를 post 컬렉션에 저장
-        db.collection('waitinfo').insertOne( {_id : 총대기인원수 + 1, myNumber : 1,
-                userid : req.body.id, wmac : 0, isUseWait : false} , function(에러, 결과){
-	        console.log('대기인원 데이터 저장완료'); 
-            
-            //DB 수정하기 - DB.counter 내의 totalWait이라는 항목도 +1 증가(총대기인원수+1)
-            //operator 종류 : $set(변경), $inc(증가), $min(기존값보다 적을 때만 변경), $rename(key값 이름변경)
-            db.collection('counter').updateOne({name: '대기인원수'}, {$inc: {totalWait:1} }, function(에러, 결과){
-                if(에러){return console.log(에러)}
-            })
-	    });       
-    });  
-})*/
-
 
 //로그인(login)에서 input한 데이터를 로그에 출력하기-------------------------------
 //1. /login에서 POST요청인 로그인을 하면 아이디, 비번 검사
@@ -254,7 +238,7 @@ passport.deserializeUser(function (아이디, done) {
 });
 
 //4. 세션있는 사람만 들어가는 웨이팅페이지(EJS와 라우팅)
-//미들웨어 사용 - 웨이팅, 웨이팅 신청완료, 웨이팅 확인 페이지 접속할 때마다 '로그인여부()' 실행
+//미들웨어 사용 - 웨이팅, 웨이팅 신청성공, 웨이팅 확인 페이지 접속할 때마다 '로그인여부()' 실행
 
 //웨이팅 페이지
 app.get('/wait', 로그인여부, function (req, res) { 
@@ -274,98 +258,37 @@ app.get('/wait', 로그인여부, function (req, res) {
 })
 
 app.post('/wait', 로그인여부, function(req, res){
-    res.send('/wait POST 전송완료')
-
-    //DB에서 데이터 꺼내기 - DB.counter 내의 대기인원수를 찾음
+    //db에서 데이터 꺼내기 - db.counter에서 name이 대기인원수인 데이터 찾기
     db.collection('counter').findOne({name: '대기인원수'}, function(에러, 결과){
         console.log("대기인원수 : " + 결과.totalWait) //결과.totalWait = 대기인원수
         var 총대기인원수 = 결과.totalWait   //총대기인원수라는 변수에 저장
-        //var 개인웨이팅번호 = 총대기인원수 - 
 
-        //DB에 저장하기 - _id : 총대기인원수+1 해서 새로운 데이터를 post 컬렉션에 저장
-        db.collection('waitinfo').insertOne( {_id : 총대기인원수 + 1, myNumber : 1,
-                userid : req.body.id, wmac : 0, isUseWait : false} , function(에러, 결과){
-	        console.log('대기인원 데이터 저장완료'); 
-            
-            //DB 수정하기 - DB.counter 내의 totalWait이라는 항목도 +1 증가(총대기인원수+1)
-            //operator 종류 : $set(변경), $inc(증가), $min(기존값보다 적을 때만 변경), $rename(key값 이름변경)
-            db.collection('counter').updateOne({name: '대기인원수'}, {$inc: {totalWait:1} }, function(에러, 결과){
-                if(에러){return console.log(에러)}
-            })
-	    });       
-    });  
-})
-
-//웨이팅 신청완료 페이지
-app.get('/waitcomplete', 로그인여부, function (req, res) {   
-    //console.log(req.user); 
-    res.render('waitcomplete.ejs', {사용자 : req.user})  //req.user를 사용자라는 이름으로 보냄
-    
-    //--------------------------------------------------
-    //DB에서 데이터 꺼내기 - DB.counter 내의 대기인원수를 찾음
-    db.collection('counter').findOne({name: '대기인원수'}, function(에러, 결과){
-        console.log("/waitcomplete 대기인원수 : " + 결과.totalWait) //결과.totalWait = 대기인원수
-        var 총대기인원수 = 결과.totalWait   //총대기인원수라는 변수에 저장
-        var 개인웨이팅번호 = 총대기인원수 + 1
-
+        //db.waitinfo에 로그인한 유저의 id를 찾아서..
         db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과){
             if(에러) return done(에러)
 
-            //db에 id가 없으면.. 웨이팅 신청 가능으로 db에 저장
+            //id가 존재하지 않다면.. 웨이팅 신청 가능으로 db에.waitinfo에 저장
             if(!결과){
-                db.collection('waitinfo').insertOne( {_id : 총대기인원수 + 1, myNumber : 개인웨이팅번호,
+                //db 저장 - 웨이팅 신청 가능으로 db에.waitinfo에 저장 (_id : 총대기인원수+1로 새로운 데이터를 저장)
+                db.collection('waitinfo').insertOne( {_id : 총대기인원수 + 1, myNumber : 총대기인원수 + 1,
                         userid : req.user.id, wmac : 0, isUseWait : false} , function(에러, 결과){
                     console.log('대기인원 데이터 저장완료');
                 
-                    //DB 수정하기 - DB.counter 내의 totalWait이라는 항목도 +1 증가(총대기인원수+1)
+                    //db 수정 - db.counter 내의 totalWait이라는 항목도 +1 증가(총대기인원수+1)
                     //operator 종류 : $set(변경), $inc(증가), $min(기존값보다 적을 때만 변경), $rename(key값 이름변경)
                     db.collection('counter').updateOne({name: '대기인원수'}, {$inc: {totalWait:1} }, function(에러, 결과){
                         if(에러){return console.log(에러)}
                     })
                 }) 
+                res.redirect('/waitsuccess')
+                console.log('웨이팅 신청성공');
             }
-
-            //db에 id가 있으면.. 웨이팅 신청 불가능
-            else{                
-                // /waitfail로 이동
-                app.get('/waitfail', 로그인여부, function(req, res) {
-                    console.log(req.user); 
-                    res.render('waitfail.ejs', {사용자 : req.user})  //req.user를 사용자라는 이름으로 보냄
-                })
-
-                console.log('웨이팅 신청이 이미 되어있는 아이디입니다.')
-            }
-        })
-
-
-        //DB에 저장하기 - _id : 총대기인원수+1 해서 새로운 데이터를 post 컬렉션에 저장
-        /*db.collection('waitinfo').insertOne( {_id : 총대기인원수 + 1, myNumber : 개인웨이팅번호,
-                userid : req.user.id, wmac : 0, isUseWait : false} , function(에러, 결과){
-	        console.log('대기인원 데이터 저장완료');
-            
-            //DB 수정하기 - DB.counter 내의 totalWait이라는 항목도 +1 증가(총대기인원수+1)
-            //operator 종류 : $set(변경), $inc(증가), $min(기존값보다 적을 때만 변경), $rename(key값 이름변경)
-            db.collection('counter').updateOne({name: '대기인원수'}, {$inc: {totalWait:1} }, function(에러, 결과){
-                if(에러){return console.log(에러)}
-            })
-	    });*/  
+            else{
+                res.redirect('/waitfail')
+                console.log('웨이팅 신청실패');
+            } 
+        })    
     });  
-    //--------------------------------------------------
-}) 
-
-//웨이팅 신청실패 페이지
-app.get('/waitfail', 로그인여부, function(req, res) {
-    console.log(req.user); 
-    res.render('waitfail.ejs', {사용자 : req.user})  //req.user를 사용자라는 이름으로 보냄
-
-    db.collection('waitinfo').findOne( {userid : req.user.id}, function(에러, 결과) {
-        if(에러) return done(에러)
-
-        //db에 id가 있으면.. 웨이팅 신청 불가능
-        if(결과) {
-            console.log('웨이팅 신청이 이미 되어있는 아이디입니다.');
-        }
-    })
 })
 
 //웨이팅 확인 페이지
@@ -374,11 +297,11 @@ app.get('/waitcheck', 로그인여부, function (req, res) {
     //res.render('waitcheck.ejs', {사용자 : req.user})  //req.user를 사용자라는 이름으로 보냄
 
     //--------------------------------------------------
-    //DB에서 데이터 꺼내기 - DB.waitinfo 내의 유저의 아이디를 찾음
+    //db.waitinfo에 로그인한 유저의 id를 찾고
     db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과1){
         console.log("/waitcheck 본인웨이팅번호 : " + 결과1.myNumber)
 
-        //DB에서 데이터 꺼내기 - DB.counter 내의 대기인원수를 찾음
+        //db.counter에서 name이 대기인원수인 데이터 찾기
         db.collection('counter').findOne({name: '대기인원수'}, function(에러, 결과2){
 
             console.log("/waitcheck 대기인원수 : " + 결과2.totalWait)
@@ -411,9 +334,8 @@ app.get('/waitcheck', 로그인여부, function (req, res) {
     //--------------------------------------------------
 }) 
 
-/* 미들웨어 생성
-   웨이팅페이지 접속 전 실행할 미들웨어 - 로그인 여부 구분
-   로그인 후 세션이 있다면, 요청.user가 항상 있음 */
+//미들웨어 생성
+//웨이팅페이지 접속 전 실행할 미들웨어 - 로그인 여부 구분(로그인 후 세션이 있다면, 요청.user가 항상 있음)
 function 로그인여부(req, res, next){
     if(req.user) {      //요청.user가 있는지 검사
         next()           //있다면 다음으로 통과
