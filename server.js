@@ -153,20 +153,20 @@ app.get('/waitsuccess', 로그인여부, function(req, res){
     res.render('waitsuccess.ejs')
 })
 
-//웨이팅 신청실패 페이지
-app.get('/waitfail', 로그인여부, function(req, res){
+//웨이팅 이미 신청된 페이지
+app.get('/waitalready', 로그인여부, function(req, res){
     console.log(req.user); 
-    res.render('waitfail.ejs')
+    res.render('waitalready.ejs')
 })
 
 //웨이팅 사용 전 확인 페이지
-app.get('/beforecheck', 로그인여부, function (req, res) { 
+app.get('/bwaituse', 로그인여부, function (req, res) { 
     console.log(req.user); 
 
     //db.waitinfo에 로그인한 유저의 id 찾기
     db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과1){
         var myNumber = 결과1.myNumber;
-        console.log("/beforecheck 본인웨이팅번호 : " + myNumber)
+        console.log("/bwaituse 본인웨이팅번호 : " + myNumber)
 
         //db.counter에서 name이 대기인원수인 데이터 찾기
         db.collection('counter').findOne({name: '대기인원수'}, function(에러, 결과2){
@@ -174,21 +174,21 @@ app.get('/beforecheck', 로그인여부, function (req, res) {
             var totalUse = 결과2.totalUse;
             var left = myNumber - totalUse - 1
 
-            console.log("/beforecheck 대기인원수 : " + totalWait)
-            console.log("/beforecheck 대기사용수 : " + totalUse)
-            console.log("/beforecheck 앞에남은인원수 : " + left)
+            console.log("/bwaituse 대기인원수 : " + totalWait)
+            console.log("/bwaituse 대기사용수 : " + totalUse)
+            console.log("/bwaituse 앞에남은인원수 : " + left)
 
-            //찾은 데이터를 beforecheck.ejs 안에 넣기
+            //찾은 데이터를 bwaituse.ejs 안에 넣기
             //req.user를 사용자라는 이름으로 보내기
-            res.render('beforecheck.ejs', {사용자 : req.user, 본인웨이팅번호 : 결과1, 대기사용수 : 결과2})
+            res.render('bwaituse.ejs', {사용자 : req.user, 본인웨이팅번호 : 결과1, 대기사용수 : 결과2})
         })
     });    
 }) 
 
 //웨이팅 사용 후 확인 페이지
-app.get('/aftercheck', function(req, res){
+app.get('/awaituse', function(req, res){
     console.log(req.user); 
-    res.render('aftercheck.ejs')
+    res.render('awaituse.ejs')
 })
 
 //웨이팅 신청 안하고 wait check한 경우
@@ -322,8 +322,8 @@ app.post('/wait', 로그인여부, function(req, res){
                 console.log('웨이팅 신청성공');
             }
             else {
-                res.redirect('/waitfail')
-                console.log('웨이팅 신청실패');
+                res.redirect('/waitalready')
+                console.log('웨이팅 이미 신청됨');
             }
         })    
     });  
@@ -360,7 +360,7 @@ app.get('/waitcheck', 로그인여부, function (req, res) {
                 })
             })
 
-            res.redirect('/aftercheck')
+            res.redirect('/awaituse')
             console.log('웨이팅 사용 후 확인');
 
             //db.counter 내의 totalUse +1 증가(대기사용수+1)
@@ -368,11 +368,11 @@ app.get('/waitcheck', 로그인여부, function (req, res) {
                 if(에러){return console.log(에러)}
             })
 
-            res.redirect('/aftercheck')
+            res.redirect('/awaituse')
             console.log('웨이팅 사용 후 확인');*/
         }
         else{
-            res.redirect('/beforecheck')
+            res.redirect('/bwaituse')
             console.log('웨이팅 사용 전 확인');
         }
     })
@@ -398,11 +398,11 @@ app.get('/waitcheck', 로그인여부, function (req, res) {
                 if(에러){return console.log(에러)}
             })
 
-            res.redirect('/aftercheck')
+            res.redirect('/awaituse')
             console.log('웨이팅 사용 후 확인');
         }
         else {
-            res.redirect('/beforecheck')
+            res.redirect('/bwaituse')
             console.log('웨이팅 사용 전 확인');
         }
     })
