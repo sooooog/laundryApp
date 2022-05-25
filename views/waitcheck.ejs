@@ -10,31 +10,18 @@
           integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn"
           crossorigin="anonymous">
 
-    <title>WAITCHECK PAGE</title>
+    <title>WAITING CHECK PAGE</title>
   </head>
 
-  <body>    
+  <body>
     <!-- 상단메뉴(Navbar) -->
     <%- include('nav.html') %>
 
     <h4 class="ml-2 my-3"><strong>웨이팅 확인 페이지</strong></h4>
 
-    <div class="container" style="background-color:lightblue; padding:30px;">
-      <div class="row">
-        <div class="col text-center">
-          <p style="color:red"> 본인의 웨이팅 번호가 다가오면 대기해주세요. </p>
-          <br>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col text-center">
-          <h4> "<%= 사용자.id %>"님의 대기번호는 <%= 본인웨이팅번호.myNumber %>번 입니다. <br>
-               현재 앞에 <%= (본인웨이팅번호.myNumber) - (대기사용수.totalUse) - 1 %>명이 있습니다.
-          </h4>
-        </div>
-      </div>
-    </div>
+    <!-- <form action="/waitcheck" method="GET">
+        <button class="btn btn-primary" type="submit">웨이팅 확인하러 가기</button>
+    </form> -->
 
 
     <!-- Optional JavaScript; choose one of the two! -->
